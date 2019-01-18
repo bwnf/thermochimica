@@ -109,6 +109,10 @@ subroutine ResetThermo
         deallocate(iPairID,dCoordinationNumber)
     end if
 
+   if (allocated(nPairsSRO)) then
+	         deallocate(nPairsSRO, STAT = INFO)
+	      i = i + INFO
+	   end if 
 
 !    if (allocated(lSpeciesStable)) then
 !        deallocate(lSpeciesStable, STAT = INFO)
