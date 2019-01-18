@@ -89,6 +89,17 @@ EXE_OBJ     = $(basename $(EXEC_SRC))
 EXE_BIN     = $(addprefix $(BIN_DIR)/,$(EXE_OBJ))
 
 ## ============
+## PROFILE:
+## ============
+
+PROF_SRC    = $(notdir $(wildcard $(TST_DIR)/*.F90))
+PROF_OBJ    = $(PROF_SRC:.F90=.o)
+PROF_LNK    = $(addprefix $(OBJ_DIR)/,$(PROF_OBJ))
+
+PRO_OBJ     = $(basename $(PROF_SRC))
+PRO_BIN     = $(addprefix $(BIN_DIR)/,$(PRO_OBJ))
+
+## ============
 ## DAILY TESTS:
 ## ============
 
@@ -187,6 +198,14 @@ doctest:
 cleandoc:
 	rm -r -f $(DOC_DIR)/html; rm -r -f $(TEX_DIR); rm -r -f $(TST_DIR)/$(DOC_DIR)/html; rm -r -f $(TST_DIR)/$(TEX_DIR); rm -r -f $(DOC_DIR)/$(TST_DIR)
 
+## ===========
+## PROFILE
+## ===========
+
+profile: $(PROF_LNK) $(SHARED_LNK) $(MODS_LNK) $(PRO_BIN)
+
+$(OBJ_DIR)/%.o: $(TST_DIR)/%.F90
+	$(FC) -I$(OBJ_DIR) -J$(OBJ_DIR) $(FCFLAGS) -c $< -o $@
 
 ## ===========
 ## DAILY TESTS
