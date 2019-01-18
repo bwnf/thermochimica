@@ -55,7 +55,7 @@
 !> \param[in]     n         An integer scalar representing the number of linear
 !!                            equations.
 !> \param[in]     A         A double real array represending the A matrix.
-!> \param[in,out] B         A double real vector (dimension n)   representing
+!> \param[in,out] B         A double real vector (dimension n) representing
 !!                            the functional vector on input and on output it
 !!                            represents the solution vector.
 !> \param[out]    INFO      An integer scalar indicating a successful exit or
@@ -100,7 +100,7 @@ subroutine ArrowSolver(m, n, A, B, INFO)
     ! Loop through number of rows representing the arrow head:
     LOOP_ArrowHead: do k = n - m + 1, n
 
-        ! Loop through columns along the diagonal:
+        ! Loop through columns left of diagonal:
         LOOP_Column: do j = 1, k - 1
 
             ! Cycle if the coefficient is zero:
@@ -109,7 +109,7 @@ subroutine ArrowSolver(m, n, A, B, INFO)
             ! Compute the multiplier:
             dMultiplier = A(j,j) / A(k,j)
 
-            ! Update all columns along row:
+            ! Update all columns along row beyond current column:
             A(k,j) = 0D0
             do i = j + 1, n
                 A(k,i) = dMultiplier * A(k,i) - A(j,i)
