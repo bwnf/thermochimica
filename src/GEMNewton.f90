@@ -104,7 +104,7 @@ subroutine GEMNewton(INFO)
 
     ! Determine the number of unknowns/linear equations:
     nVar = nElements + nConPhases + nSolnPhases
-    ! empirically seems to work based on LAPACK auto-optimization results:
+    ! Empirically seems to work based on LAPACK auto-optimization results:
     LWORK               = 64 * nVar
 
     ! Allocate memory:
