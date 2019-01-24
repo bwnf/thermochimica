@@ -71,7 +71,7 @@ program nucProf
         ! Call Thermochimica:
         call Thermochimica
 
-        print *, j
+        ! print *, j
 
     end do
 
