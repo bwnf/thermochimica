@@ -64,16 +64,14 @@ subroutine CompStoichSolnPhase(k)
         ! I have no idea if this is safe
         if (dTemp < 1D-9) cycle LOOP_A
 
+        ! Check for a NAN (presumably can be done in outer loop):
+        if (dTemp /= dTemp) then
+            INFOThermo = 24
+            exit LOOP_A
+        end if
+
         LOOP_B: do j = 1,nElements
             dEffStoichSolnPhase(k,j) = dEffStoichSolnPhase(k,j) + dTemp * dStoichSpecies(i,j)
-
-            ! Check for a NAN:
-            if (dEffStoichSolnPhase(k,j) /= dEffStoichSolnPhase(k,j)) then
-                INFOThermo = 24
-
-                exit LOOP_A
-            end if
-
         end do LOOP_B
 
     end do LOOP_A
