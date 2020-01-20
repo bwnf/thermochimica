@@ -122,8 +122,10 @@ subroutine CheckConvergence
     lCompEverything = .TRUE.
     lPhaseChange    = .FALSE.
 
+    ! print *, iAssemblage
     ! Test if the largest relative change in species mole fraction is large
     ! This is a self-consistency check
+    ! print *, "Test self-consistency ", dMaxSpeciesChange
     if (dMaxSpeciesChange > LOG(2D0)) then
         return
     end if
@@ -135,12 +137,13 @@ subroutine CheckConvergence
     if ((dGEMFunctionNorm < 1D-5).AND.(iterGlobal > 1000))                      lConverged = .TRUE.
 
     ! Return if the functional norm is too large.  In other words, it's not worth the flops checking.
+    ! print *, "Test functional norm ", dGEMFunctionNorm
     if (dGEMFunctionNorm > dTolerance(1)) return
 
 
     ! TEST #1: Check if any of the phases in the assemblage are "dummy" phases:
     ! -------------------------------------------------------------------------
-
+    ! print *, "Test 1"
     LOOP_TEST1: do i = 1, nElements
         if (iAssemblage(i) > 0) then
             if (iPhase(iAssemblage(i)) < 0) return
@@ -149,12 +152,12 @@ subroutine CheckConvergence
 
     ! TEST #2: Check to make sure that the number of moles of all phases are non-negative.
     ! ------------------------------------------------------------------------------------
-
+    ! print *, "Test 2 ", MINVAL(dMolesPhase)
     if (MINVAL(dMolesPhase) < 0D0) return
 
     ! TEST #3: Check that the Phase Rule has been satisfied:
     ! -----------------------------------------------------------------------------------
-
+    ! print *, "Test 3 "
     if (nSolnPhases + nConPhases > nElements - nChargedConstraints) call CorrectPhaseRule(lPhaseChange)
 
     if (lPhaseChange) return
@@ -164,12 +167,16 @@ subroutine CheckConvergence
 
     ! Compute the driving force for all pure condensed phases:
     call CompDrivingForce(iMaxDrivingForce, dMaxDrivingForce)
-
+    if (iMaxDrivingForce > 0) then
+        ! print *, "Test 4 ", dMaxDrivingForce, cSpeciesName(iMaxDrivingForce)
+    else
+        ! print *, "Test 4 ", dMaxDrivingForce
+    end if
     if (dMaxDrivingForce < dTolerance(4)) return
 
     ! TEST #5: Check the residuals of chemical potential terms:
     ! ---------------------------------------------------------
-
+    ! print *, "Test 5 "
     LOOP_TEST5: do j = 1, nSolnPhases
         k = -iAssemblage(nElements - j + 1)
 
@@ -199,7 +206,7 @@ subroutine CheckConvergence
 
     ! TEST #6: Check the residuals of site fractions on each sublattice of a CEF phase:
     ! ---------------------------------------------------------------------------------
-
+    ! print *, "Test 6 "
     ! Loop through solution phases that are stable:
     LOOP_TEST6: do j = 1, nSolnPhases
 
@@ -232,7 +239,8 @@ subroutine CheckConvergence
 
     ! TEST #7: Check if a solution phase should be added to the phase assemblage:
     ! ---------------------------------------------------------------------------
-
+    ! print *, "Test 7 "
+    ! call CompChemicalPotential(.TRUE.)
     LOOP_TEST7: do i = 1,nSolnPhasesSys
 
         ! Skip this phase if it is already predicted to be stable:
@@ -243,13 +251,16 @@ subroutine CheckConvergence
         if (lMiscibility(i)) cycle LOOP_TEST7
 
         ! Check if the driving force of this solution phase is less than the tolerance:
-        if (dDrivingForceSoln(i) < dTolerance(4)) return
+        if (dDrivingForceSoln(i) < dTolerance(4)) then
+            ! print *, cSpeciesName(i), dDrivingForceSoln(i)
+            return
+        end if
 
     end do LOOP_TEST7
 
     ! TEST #8: Check the relative errors of the mass balance equations:
     ! -----------------------------------------------------------------
-
+    ! print *, "Test 8 "
     LOOP_TEST8: do j = 1, nElements
         dResidual = -dMolesElement(j)
         ! Loop through solution phases:
@@ -279,7 +290,7 @@ subroutine CheckConvergence
 
     ! TEST #9: Check for a miscibility gap:
     ! -------------------------------------
-
+    ! print *, "Test 9 "
     ! Loop through all solution phases in the system to check for a miscibility gap:
     LOOP_TEST9: do i = 1, nSolnPhasesSys
 
@@ -323,7 +334,7 @@ subroutine CheckConvergence
         end if
 
     end do LOOP_TEST9
-
+    ! print *, "Test INFO ", INFOThermo
     ! If all of the above criterions have been satisfied, then the system has converged.
     if (INFOThermo == 0) lConverged = .TRUE.
 
